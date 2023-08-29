@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
@@ -11,6 +12,9 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public TMP_Text NameText;
+    [SerializeField] Button exitButton;
+    private GameManager GameManager;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -22,6 +26,7 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        GameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -36,6 +41,8 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+        NameText.text = "Name: " + GameManager.nameString;
+        exitButton.onClick.AddListener(delegate { LoadMenu(); });
     }
 
     private void Update()
@@ -72,5 +79,10 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+    }
+
+    public void LoadMenu()
+    {
+        SceneManager.LoadScene(0);
     }
 }
