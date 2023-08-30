@@ -12,6 +12,7 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text HighScoreText;
     public TMP_Text NameText;
     [SerializeField] Button exitButton;
     private GameManager GameManager;
@@ -19,14 +20,16 @@ public class MainManager : MonoBehaviour
     
     private bool m_Started = false;
     private int m_Points;
-    
+    public int m_BestPoints;
+
     private bool m_GameOver = false;
 
     
     // Start is called before the first frame update
     void Start()
     {
-        GameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
+        m_BestPoints = GameManager.Instance.highScore;
+        HighScoreText.text = $"High Score: {m_BestPoints}";
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -41,7 +44,7 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
-        NameText.text = "Name: " + GameManager.nameString;
+        NameText.text = "Name: " + GameManager.Instance.nameString;
         exitButton.onClick.AddListener(delegate { LoadMenu(); });
     }
 
@@ -72,17 +75,25 @@ public class MainManager : MonoBehaviour
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        ScoreText.text = $"Score: {m_Points}";
+        if (m_Points > m_BestPoints)
+        {
+            m_BestPoints = m_Points;
+            HighScoreText.text = $"High Score: {m_BestPoints}";
+        }
     }
 
     public void GameOver()
     {
+        GameManager.Instance.highScore = m_BestPoints;
+        GameManager.Instance.SaveScore();
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
 
     public void LoadMenu()
     {
+        GameManager.Instance.SaveScore();
         SceneManager.LoadScene(0);
     }
 }
